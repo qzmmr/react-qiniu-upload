@@ -12,7 +12,7 @@
   "bugs": {
     "url": "https://github.com/qzmmr/react-qiniu-upload/issues"
   },
-  "homepage": "https://github.com/qzmmr/http-react-qiniu-upload#readme",
+  "homepage": "https://github.com/qzmmr/react-qiniu-upload#readme",
   "dependencies": {
     "antd": "^3.6.6",
     "https-axios": "^0.1.0",
