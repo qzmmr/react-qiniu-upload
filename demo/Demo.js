@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import http from 'https-axios'
-import QiniuUpload from "./antd-upload/antd-upload";
+import QiniuUpload from "../src/components/QiniuUpload";
 
 const ACTION_QINIU_TOKEN = 'ACTION_QINIU_TOKEN'
 
-class App extends Component {
+class Demo extends Component {
     state = {
         value: '',
         token: ''
@@ -22,7 +22,7 @@ class App extends Component {
             'content-type': 'application/json; charset=utf-8',
             'accept': 'application/json'
         }
-        http.POST('url', {
+        http.POST('you url', {
             data: {},
             sign: '',
             timestamp: ''
@@ -64,4 +64,4 @@ class App extends Component {
     }
 }
 
-export default App;
+export default Demo;

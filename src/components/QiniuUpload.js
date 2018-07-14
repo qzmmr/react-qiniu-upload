@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import http from 'https-axios'
+import http from 'http-axios'
 import {Upload, Modal, Icon, message} from 'antd'
 import 'antd/dist/antd.css';
 
