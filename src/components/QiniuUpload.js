@@ -75,7 +75,9 @@ class QiniuUpload extends Component {
         const {cdn = ''} = this.props
         let fileList = []
         let fileListItem = {uid: -1, name: 'image.png', status: 'done'}
-        fileListItem.url = cdn + url
+        if (url) {
+            fileListItem.url = cdn + url
+        }
         if (this.multips > 1) {
             for (let item in url) {
                 if (typeof item === 'object') {
