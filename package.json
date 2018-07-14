@@ -1,6 +1,6 @@
 {
   "name": "react-qiniu-upload",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "It's react component for upload image with base on ant-design style.",
   "main": "lib/index.js",
   "repository": {
@@ -29,5 +29,8 @@
     "http-axios": "^1.0.4",
     "react": "^16.4.1",
     "react-dom": "^16.4.1"
+  },
+  "directories": {
+    "lib": "lib"
   }
 }
