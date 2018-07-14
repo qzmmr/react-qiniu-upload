@@ -21,7 +21,7 @@ class QiniuUpload extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.value) {
-            if (this.props.value == undefined) {
+            if (this.props.value === undefined) {
                 this.setSrc(nextProps.value)
             }
         }
@@ -36,8 +36,8 @@ class QiniuUpload extends Component {
         });
     }
 
-    handleChange = (info) => {
-        this.setState({fileList: info['fileList']})
+    handleChange = ({fileList}) => {
+        this.setState({fileList: fileList})
     }
 
     httpCustomRequest = (info) => {
@@ -71,15 +71,14 @@ class QiniuUpload extends Component {
         }
     }
 
-    setSrc = (url) => {
+    setSrc = (url = '') => {
+        const {cdn = ''} = this.props
         let fileList = []
         let fileListItem = {uid: -1, name: 'image.png', status: 'done'}
-        if (url) {
-            fileListItem.url = url
-        }
+        fileListItem.url = cdn + url
         if (this.multips > 1) {
             for (let item in url) {
-                if (typeof item == 'object') {
+                if (typeof item === 'object') {
                     item.name ? fileListItem.name = item.name : null
                     fileListItem.url = item.url
                 }
