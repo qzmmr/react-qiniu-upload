@@ -1,5 +1,5 @@
-import QiniuUpload from './components/QiniuUpload'
+import PicturesWall from './components/PicturesWall'
 
 module.exports={
-    QiniuUpload
+    QiniuUpload: PicturesWall
 }

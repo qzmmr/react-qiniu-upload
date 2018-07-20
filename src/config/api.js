@@ -1,0 +1,1 @@
+export const API_QINIU_ROUTE = '//up-z2.qbox.me/'

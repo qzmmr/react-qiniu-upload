@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import http from 'https-axios'
-import QiniuUpload from "../src/components/QiniuUpload";
+import PicturesWall from "../src/components/PicturesWall";
 
 const ACTION_QINIU_TOKEN = 'ACTION_QINIU_TOKEN'
 
@@ -54,7 +54,7 @@ class Demo extends Component {
     render() {
         return (
             <div className="App" style={{background: '#000', padding: 10}}>
-                <QiniuUpload
+                <PicturesWall
                     token={this.state.token}
                     value={this.state.value}
                     onChange={this.onChange}
