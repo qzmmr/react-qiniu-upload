@@ -14,12 +14,6 @@ class FileDragger extends Component {
         info: {},
     }
 
-    componentDidMount() {
-    }
-
-    componentWillReceiveProps(nextProps) {
-
-    }
 
     handleChange = (info) => {
         // this.setState({info: info})
@@ -31,26 +25,24 @@ class FileDragger extends Component {
     }
 
     onRealSuccess = (res, action) => {
-        this.props.onChange(res.hash)
-        const info = this.state.info
-        const status = info.file.status;
-        if (status !== 'uploading') {
-            console.log(info.file, info.fileList);
-        }
-        if (status === 'done') {
-            message.success(`${info.file.name} 文件上传成功.`);
-        }
-        else if (status === 'error') {
-            message.error(`${info.file.name} 文件上传失败.`);
-        }
+        const {cdn = ''} = this.props
+        this.props.onChange(cdn + res.hash)
+        let info = this.state.info
+        info.file.status = 'done'
+        message.success(`${info.file.name} 文件上传成功.`)
+
     }
 
     onFailure = (code, data, action) => {
-        message.error('上传失败', code)
+        let info = this.state.info
+        info.file.status = 'error'
+        message.error(`${info.file.name} 文件上传失败.`)
     }
 
     onError = (status) => {
-        message.error('上传错误', status)
+        let info = this.state.info
+        info.file.status = 'error'
+        message.error(`${info.file.name} 文件上传错误.`)
     }
 
     httpUploadImage = () => {
