@@ -1,5 +1,7 @@
 import PicturesWall from './components/PicturesWall'
+import FileDragger from "./components/FileDragger";
 
-module.exports={
-    QiniuUpload: PicturesWall
+module.exports = {
+    PicturesWall: PicturesWall,
+    FileDragger: FileDragger
 }
