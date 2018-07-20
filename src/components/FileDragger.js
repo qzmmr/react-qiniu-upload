@@ -11,54 +11,99 @@ const Dragger = Upload.Dragger
 
 class FileDragger extends Component {
     state = {
-        info: {},
-        value: ''
+        fileList: [],
+        value: '',
+        multiple: false
     }
 
     componentDidMount() {
-        this.setState({value: this.props.value})
+        // const {multiple = false} = this.props
+        // this.setState({multiple: multiple})
+        this.setValue(this.props.value)
     }
 
-    handleChange = (info) => {
-        // this.setState({info: info})
+    setValue = (value = '') => {
+        const {multiple} = this.state
+        let fileList = []
+        if (!multiple) {
+            //单文件上传
+            fileList = [{
+                uid: -1,
+                name: '原文件',
+                status: 'done',
+                url: value,
+                thumbUrl: value
+            }]
+        }
+        else {
+            //多文件上传暂未实现
+            value.forEach((item, index) => {
+                fileList.push({
+                    uid: -1 - index,
+                    name: '文件 ' + index,
+                    status: 'done',
+                    url: item,
+                    thumbUrl: item
+                })
+            })
+        }
+        this.setState({fileList: fileList})
     }
 
-    httpCustomRequest = (info) => {
-        this.setState({info: info})
-        this.httpUploadImage()
+    handleChange = ({fileList, file}) => {
+        if (!this.state.multiple) {
+            this.setState({fileList: [file]})
+        }
+        else {
+            this.setState({fileList: fileList})
+        }
     }
 
-    onRealSuccess = (res, action) => {
-        const {cdn = ''} = this.props
-        this.props.onChange(cdn + res.hash)
-        this.setState({value: cdn + res.hash})
-
-        let info = this.state.info
-        info.file.status = 'done'
-        message.success(`${info.file.name} 文件上传成功.`)
+    httpCustomRequest = ({fileList, file}) => {
+        this.setState({fileList: fileList, file: file})
+        this.httpUploadImage(file)
     }
 
-    onFailure = (code, data, action) => {
-        let info = this.state.info
-        info.file.status = 'error'
-        message.error(`${info.file.name} 文件上传失败.`)
-    }
-
-    onError = (status) => {
-        let info = this.state.info
-        info.file.status = 'error'
-        message.error(`${info.file.name} 文件上传错误.`)
-    }
-
-    httpUploadImage = () => {
+    httpUploadImage = (file) => {
         const formdata = new FormData();
         if (this.props.token) {
             formdata.append('token', this.props.token);
-            formdata.append('file', this.state.info.file);
+            formdata.append('file', file);
             http.POST(API_QINIU_ROUTE, formdata, this, ACTION_FILE_DRAGGER, {'Content-Type': undefined})
         }
         else {
             message.error('缺失上传token')
+        }
+    }
+
+    onRealSuccess = (res, action) => {
+        const {cdn = ''} = this.props
+        if (!this.state.multiple) {
+            this.props.onChange(cdn + res.hash)
+            this.setValue(cdn + res.hash)
+
+            let {fileList} = this.state
+            let file = fileList[0]
+            file.status = 'done'
+            message.success(`${file.name} 文件上传成功.`)
+        }
+    }
+
+    onFailure = (code, data, action) => {
+        if (!this.state.multiple) {
+            let {fileList} = this.state
+            let file = fileList[0]
+            file.status = 'error'
+            message.error(`${file.name} 文件上传失败.`)
+        }
+    }
+
+    onError = (status) => {
+        if (!this.state.multiple) {
+            let {fileList} = this.state
+            let file = fileList[0]
+            file.status = 'error'
+            message.error(`${file.name}文件上传错误.`)
         }
     }
 
@@ -76,27 +121,31 @@ class FileDragger extends Component {
     }
 
     render() {
-        const {value} = this.state
+        const {value, fileList, multiple} = this.state
         const {showValue = false} = this.props
         const props = {
-            name: 'file',
+            multiple: multiple,
+            fileList: fileList,
             action: API_QINIU_ROUTE,
             customRequest: this.httpCustomRequest,
             onChange: this.handleChange,
         };
         return (
-            <Dragger {...props}>
-                <p className="ant-upload-drag-icon">
-                    <Icon type="inbox"/>
-                </p>
-                <p className="ant-upload-text">将拖拽文件至此处上传</p>
+            <div>
+                <Dragger {...props}>
+                    <p className="ant-upload-drag-icon">
+                        <Icon type="inbox"/>
+                    </p>
+                    <p className="ant-upload-text">将拖拽文件至此处上传</p>
+                </Dragger>
                 {showValue ?
                     <p className="ant-upload-hint">
                         {value}
                         <Icon type="copy" onClick={() => this.handleCopyClick(value)} style={{margin: '0 2px'}}/>
                     </p>
                     : null}
-            </Dragger>
+            </div>
+
         )
     }
 }
