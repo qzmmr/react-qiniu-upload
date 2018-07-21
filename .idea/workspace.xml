@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="37c9427f-a9d8-409d-8644-4df315af5359" name="Default" comment="[修复]解决文件上传成功组件页面状态未更新错误">
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/FileDragger.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/FileDragger.js" afterDir="false" />
-    </list>
+    <list default="true" id="37c9427f-a9d8-409d-8644-4df315af5359" name="Default" comment="[修复]解决文件上传成功组件页面状态未更新错误" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -273,7 +270,7 @@
       <workItem from="1532056854286" duration="4587000" />
       <workItem from="1532069443255" duration="2172000" />
       <workItem from="1532073616654" duration="16957000" />
-      <workItem from="1532156047144" duration="3565000" />
+      <workItem from="1532156047144" duration="3897000" />
     </task>
     <task id="LOCAL-00001" summary="[更新]完成基于ant-design样式的七牛图片上传组件">
       <created>1531303238100</created>
@@ -356,7 +353,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="61131000" />
+    <option name="totallyTimeSpent" value="61463000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
