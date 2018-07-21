@@ -11,6 +11,7 @@ const Dragger = Upload.Dragger
 
 class FileDragger extends Component {
     state = {
+        file: {},
         fileList: [],
         value: '',
         multiple: false
@@ -22,25 +23,35 @@ class FileDragger extends Component {
         this.setValue(this.props.value)
     }
 
-    setValue = (value = '') => {
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.value) {
+            if (this.props.value === undefined) {
+                this.setValue(nextProps.value)
+            }
+        }
+    }
+
+    setValue = (value) => {
         const {multiple} = this.state
         let fileList = []
+        if (!value) return
         if (!multiple) {
             //单文件上传
             fileList = [{
                 uid: -1,
-                name: '原文件',
+                name: value,
                 status: 'done',
                 url: value,
                 thumbUrl: value
             }]
+            this.setState({file: fileList[0]})
         }
         else {
             //多文件上传暂未实现
             value.forEach((item, index) => {
                 fileList.push({
                     uid: -1 - index,
-                    name: '文件 ' + index,
+                    name: item,
                     status: 'done',
                     url: item,
                     thumbUrl: item
@@ -52,7 +63,7 @@ class FileDragger extends Component {
 
     handleChange = ({fileList, file}) => {
         if (!this.state.multiple) {
-            this.setState({fileList: [file]})
+            this.setState({fileList: [file], file: file})
         }
         else {
             this.setState({fileList: fileList})
@@ -84,8 +95,10 @@ class FileDragger extends Component {
 
             let {fileList} = this.state
             let file = fileList[0]
-            file.status = 'done'
             message.success(`${file.name} 文件上传成功.`)
+        }
+        else {
+
         }
     }
 
@@ -107,6 +120,17 @@ class FileDragger extends Component {
         }
     }
 
+    handleRemove = (file) => {
+        this.setState(({fileList}) => {
+            const index = fileList.indexOf(file);
+            const newFileList = fileList.slice();
+            newFileList.splice(index, 1);
+            return {
+                fileList: newFileList,
+            }
+        })
+    }
+
     handleCopyClick = (value) => {
         let p = document.createElement('textarea')
         p.value = value
@@ -121,12 +145,14 @@ class FileDragger extends Component {
     }
 
     render() {
-        const {value, fileList, multiple} = this.state
+        const {file, fileList, multiple} = this.state
         const {showValue = false} = this.props
         const props = {
             multiple: multiple,
+            listType: 'picture',
             fileList: fileList,
             action: API_QINIU_ROUTE,
+            onRemove: this.handleRemove,
             customRequest: this.httpCustomRequest,
             onChange: this.handleChange,
         };
@@ -140,10 +166,11 @@ class FileDragger extends Component {
                 </Dragger>
                 {showValue ?
                     <p className="ant-upload-hint">
-                        {value}
-                        <Icon type="copy" onClick={() => this.handleCopyClick(value)} style={{margin: '0 2px'}}/>
+                        {file.name}
+                        <Icon type="copy" onClick={() => this.handleCopyClick(file.url)} style={{margin: '0 2px'}}/>
                     </p>
-                    : null}
+                    : null
+                }
             </div>
 
         )
