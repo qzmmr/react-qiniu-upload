@@ -20,42 +20,67 @@ class FileDragger extends Component {
     componentDidMount() {
         // const {multiple = false} = this.props
         // this.setState({multiple: multiple})
-        this.setValue(this.props.value)
+        this.setFile(this.props.value)
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.value) {
             if (this.props.value === undefined) {
-                this.setValue(nextProps.value)
+                this.setFile(nextProps.value)
             }
         }
     }
 
-    setValue = (value) => {
+    setFile = (file) => {
         const {multiple} = this.state
+        if (!file) return
         let fileList = []
-        if (!value) return
         if (!multiple) {
             //单文件上传
-            fileList = [{
-                uid: -1,
-                name: value,
-                status: 'done',
-                url: value,
-                thumbUrl: value
-            }]
+            if (typeof file === 'object') {
+                fileList = [file]
+            }
+            else if (typeof file === 'string') {
+                fileList = [{
+                    uid: -1,
+                    name: file,
+                    status: 'done',
+                    url: file
+                }]
+            }
+            else {
+                fileList = [{
+                    uid: -1,
+                    name: '未知文件',
+                    status: 'done',
+                    url: file
+                }]
+            }
             this.setState({file: fileList[0]})
         }
         else {
             //多文件上传暂未实现
-            value.forEach((item, index) => {
-                fileList.push({
-                    uid: -1 - index,
-                    name: item,
-                    status: 'done',
-                    url: item,
-                    thumbUrl: item
-                })
+            file.forEach((item, index) => {
+
+                if (typeof item === 'object') {
+                    fileList.push(item)
+                }
+                else if (typeof file === 'string') {
+                    fileList.push({
+                        uid: -1 - index,
+                        name: item,
+                        status: 'done',
+                        url: item
+                    })
+                }
+                else {
+                    fileList = [{
+                        uid: -1 - index,
+                        name: '未知文件-' + index,
+                        status: 'done',
+                        url: item
+                    }]
+                }
             })
         }
         this.setState({fileList: fileList})
@@ -66,7 +91,7 @@ class FileDragger extends Component {
             this.setState({fileList: [file], file: file})
         }
         else {
-            this.setState({fileList: fileList})
+            this.setState({fileList: fileList, file: file})
         }
     }
 
@@ -91,11 +116,10 @@ class FileDragger extends Component {
         const {cdn = ''} = this.props
         if (!this.state.multiple) {
             this.props.onChange(cdn + res.hash)
-            this.setValue(cdn + res.hash)
-
-            let {fileList} = this.state
-            let file = fileList[0]
+            let {file} = this.state
             message.success(`${file.name} 文件上传成功.`)
+            file.url = cdn + res.hash
+            this.setFile(file)
         }
         else {
 
@@ -104,8 +128,7 @@ class FileDragger extends Component {
 
     onFailure = (code, data, action) => {
         if (!this.state.multiple) {
-            let {fileList} = this.state
-            let file = fileList[0]
+            let {file} = this.state
             file.status = 'error'
             message.error(`${file.name} 文件上传失败.`)
         }
@@ -113,8 +136,7 @@ class FileDragger extends Component {
 
     onError = (status) => {
         if (!this.state.multiple) {
-            let {fileList} = this.state
-            let file = fileList[0]
+            let {file} = this.state
             file.status = 'error'
             message.error(`${file.name}文件上传错误.`)
         }
@@ -157,7 +179,7 @@ class FileDragger extends Component {
             onChange: this.handleChange,
         };
         return (
-            <div>
+            <div style={{width: '100%'}}>
                 <Dragger {...props}>
                     <p className="ant-upload-drag-icon">
                         <Icon type="inbox"/>
