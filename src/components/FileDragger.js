@@ -23,14 +23,6 @@ class FileDragger extends Component {
         this.setFile(this.props.value)
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.value) {
-            if (this.props.value === undefined) {
-                this.setFile(nextProps.value)
-            }
-        }
-    }
-
     setFile = (file) => {
         const {multiple} = this.state
         if (!file) return
@@ -118,6 +110,7 @@ class FileDragger extends Component {
             this.props.onChange(cdn + res.hash)
             let {file} = this.state
             message.success(`${file.name} 文件上传成功.`)
+            file.status='done'
             file.url = cdn + res.hash
             this.setFile(file)
         }
