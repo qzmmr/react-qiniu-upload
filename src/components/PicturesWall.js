@@ -23,13 +23,26 @@ class PicturesWall extends Component {
     }
 
     componentDidMount() {
+        this.multips = this.multips || 1
         const {
             value,
             responsePrefix = default_responsePrefix,
             responseSuffix = default_responseSuffix
         } = this.props
-        this.multips = this.multips || 1
         value ? this.setSrc(responsePrefix + value + responseSuffix) : null
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const {
+            value,
+            responsePrefix = default_responsePrefix,
+            responseSuffix = default_responseSuffix
+        } = this.props
+        if (nextProps.value) {
+            if (this.props.value === undefined) {
+                this.setSrc(responsePrefix + value + responseSuffix)
+            }
+        }
     }
 
     handleCancel = () => this.setState({previewVisible: false})

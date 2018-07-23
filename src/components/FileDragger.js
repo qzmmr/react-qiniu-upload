@@ -225,3 +225,5 @@ class FileDragger extends Component {
         )
     }
 }
+
+export default FileDragger
