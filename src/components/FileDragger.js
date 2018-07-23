@@ -4,25 +4,39 @@ import http from 'http-axios'
 import 'antd/dist/antd.css';
 import {API_QINIU_ROUTE} from "../config/api";
 
+const Dragger = Upload.Dragger
+
 const ACTION_FILE_DRAGGER = 'ACTION_FILE_DRAGGER'
 
-const Dragger = Upload.Dragger
+//组件属性默认配置列表
+const default_token = ''    //必填
+const default_clipboard = false
+const default_multiple = false
+const default_listType = 'text'
+const default_isCustomName = false
+const default_isCustomResponse = false
+const default_responsePrefix = ''
+const default_responseSuffix = ''
 
 class FileDragger extends Component {
     state = {
         file: {},
         fileList: [],
-        value: '',
-        multiple: false
+        multiple: default_multiple
     }
 
     componentDidMount() {
         // const {multiple = false} = this.props
         // this.setState({multiple: multiple})
-        this.setFile(this.props.value)
+        const {
+            responsePrefix = default_responsePrefix,
+            responseSuffix = default_responseSuffix,
+            value
+        } = this.props
+        this.setFile(responsePrefix + value + responseSuffix)
     }
 
-    setFile = (file) => {
+    setFile = file => {
         const {multiple} = this.state
         if (!file) return
         let fileList = []
@@ -91,12 +105,13 @@ class FileDragger extends Component {
         this.httpUploadImage(file)
     }
 
-    httpUploadImage = (file) => {
+    httpUploadImage = file => {
+        const {isCustomName = default_isCustomName} = this.props
         const formdata = new FormData();
         if (this.props.token) {
             formdata.append('token', this.props.token);
-            formdata.append('key', file.name)
             formdata.append('file', file);
+            isCustomName ? formdata.append('key', file.name) : null
             http.POST(API_QINIU_ROUTE, formdata, this, ACTION_FILE_DRAGGER, {'Content-Type': undefined})
         }
         else {
@@ -104,14 +119,20 @@ class FileDragger extends Component {
         }
     }
 
-    onRealSuccess = (res, action) => {
-        const {cdn = ''} = this.props
+    onRealSuccess = data => {
+        const {
+            isCustomResponse = default_isCustomResponse,
+            responsePrefix = default_responsePrefix,
+            responseSuffix = default_responseSuffix
+        } = this.props
+        let response = data.key
         if (!this.state.multiple) {
-            this.props.onChange(cdn + res.key)
+            isCustomResponse ? (response = responsePrefix + data.key + responseSuffix) : null
+            this.props.onChange(response)
             let {file} = this.state
             message.success(`${file.name} 文件上传成功.`)
             file.status = 'done'
-            file.url = cdn + res.key
+            file.url = responsePrefix + data.key + responseSuffix
             this.setFile(file)
         }
         else {
@@ -119,7 +140,7 @@ class FileDragger extends Component {
         }
     }
 
-    onFailure = (code, data, action) => {
+    onFailure = code => {
         if (!this.state.multiple) {
             let {file} = this.state
             file.status = 'error'
@@ -127,7 +148,7 @@ class FileDragger extends Component {
         }
     }
 
-    onError = (status) => {
+    onError = status => {
         if (!this.state.multiple) {
             let {file} = this.state
             file.status = 'error'
@@ -135,7 +156,7 @@ class FileDragger extends Component {
         }
     }
 
-    handleRemove = (file) => {
+    handleRemove = file => {
         this.setState(({fileList}) => {
             const index = fileList.indexOf(file);
             const newFileList = fileList.slice();
@@ -175,10 +196,10 @@ class FileDragger extends Component {
 
     render() {
         const {file, fileList, multiple} = this.state
-        const {showValue = false} = this.props
+        const {clipboard = default_clipboard, listType = default_listType} = this.props
         const props = {
             multiple: multiple,
-            listType: 'picture',
+            listType: listType,
             fileList: fileList,
             action: API_QINIU_ROUTE,
             onRemove: this.handleRemove,
@@ -193,10 +214,9 @@ class FileDragger extends Component {
                     </p>
                     <p className="ant-upload-text">将拖拽文件至此处上传</p>
                 </Dragger>
-                {showValue ?
+                {clipboard ?
                     <p className="ant-upload-hint">
-                        {file.name}
-                        <Icon type="copy" onClick={() => this.handleCopyClick(file.url)} style={{margin: '0 2px'}}/>
+                        <Icon type="copy" onClick={() => this.handleCopyClick(file.url)} style={{margin: '0 2px'}}/>复制到剪贴板
                     </p>
                     : null
                 }
@@ -205,5 +225,3 @@ class FileDragger extends Component {
         )
     }
 }
-
-export default FileDragger

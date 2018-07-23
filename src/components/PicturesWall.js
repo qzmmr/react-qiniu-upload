@@ -6,6 +6,14 @@ import 'antd/dist/antd.css';
 const API_QINIU_ROUTE = '//up-z2.qbox.me/'
 
 const ACTION_IMAGE_UPLOAD = 'ACTION_IMAGE_UPLOAD'
+//组件属性默认配置列表
+const default_token = ''    //必填
+const default_multiple = false
+const default_listType = 'picture-card'
+const default_isCustomName = false
+const default_isCustomResponse = false
+const default_responsePrefix = ''
+const default_responseSuffix = ''
 
 class PicturesWall extends Component {
     state = {
@@ -15,23 +23,20 @@ class PicturesWall extends Component {
     }
 
     componentDidMount() {
+        const {
+            value,
+            responsePrefix = default_responsePrefix,
+            responseSuffix = default_responseSuffix
+        } = this.props
         this.multips = this.multips || 1
-        this.setSrc(this.props.value)
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.value) {
-            if (this.props.value === undefined) {
-                this.setSrc(nextProps.value)
-            }
-        }
+        value ? this.setSrc(responsePrefix + value + responseSuffix) : null
     }
 
     handleCancel = () => this.setState({previewVisible: false})
 
     handlePreview = (file) => {
         this.setState({
-            previewImage: file.thumbUrl,
+            previewImage: file.url,
             previewVisible: true,
         });
     }
@@ -42,12 +47,19 @@ class PicturesWall extends Component {
 
     httpCustomRequest = (info) => {
         this.setState({actions: info})
-        this.httpUploadImage()
+        this.httpUploadImage(info.file)
     }
 
-    onRealSuccess = (res, action) => {
+    onRealSuccess = data => {
+        const {
+            isCustomResponse = default_isCustomResponse,
+            responsePrefix = default_responsePrefix,
+            responseSuffix = default_responseSuffix
+        } = this.props
         this.state.fileList[0].status = 'done'
-        this.props.onChange(res.hash)
+        let response = data.key
+        isCustomResponse ? (response = responsePrefix + data.key + responseSuffix) : null
+        this.props.onChange(response)
         message.success('上传成功')
     }
 
@@ -59,11 +71,13 @@ class PicturesWall extends Component {
         message.error('上传错误', status)
     }
 
-    httpUploadImage = () => {
+    httpUploadImage = file => {
+        const {isCustomName = default_isCustomName} = this.props
         const formdata = new FormData();
         if (this.props.token) {
             formdata.append('token', this.props.token);
-            formdata.append('file', this.state.actions.file);
+            formdata.append('file', file);
+            isCustomName ? formdata.append('key', file.name) : null
             http.POST(API_QINIU_ROUTE, formdata, this, ACTION_IMAGE_UPLOAD, {'Content-Type': undefined})
         }
         else {
@@ -71,12 +85,11 @@ class PicturesWall extends Component {
         }
     }
 
-    setSrc = (url = '') => {
-        const {cdn = ''} = this.props
+    setSrc = (url) => {
         let fileList = []
-        let fileListItem = {uid: -1, name: 'image.png', status: 'done'}
+        let fileListItem = {uid: -1, name: url, status: 'done'}
         if (url) {
-            fileListItem.url = cdn + url
+            fileListItem.url = url
         }
         if (this.multips > 1) {
             for (let item in url) {
@@ -102,6 +115,9 @@ class PicturesWall extends Component {
 
     render() {
         const {previewVisible, previewImage, fileList} = this.state;
+        const {
+            listType = default_listType
+        } = this.props
         const uploadButton = (
             <div>
                 <Icon type="plus"/>
@@ -110,7 +126,7 @@ class PicturesWall extends Component {
         );
         const props = {
             action: API_QINIU_ROUTE,
-            listType: "picture-card",
+            listType: listType,
             fileList: fileList,
             onPreview: this.handlePreview,
             onChange: this.handleChange,
