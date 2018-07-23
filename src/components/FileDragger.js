@@ -4,7 +4,6 @@ import http from 'http-axios'
 import 'antd/dist/antd.css';
 import {API_QINIU_ROUTE} from "../config/api";
 
-
 const ACTION_FILE_DRAGGER = 'ACTION_FILE_DRAGGER'
 
 const Dragger = Upload.Dragger
@@ -96,6 +95,7 @@ class FileDragger extends Component {
         const formdata = new FormData();
         if (this.props.token) {
             formdata.append('token', this.props.token);
+            formdata.append('key', file.name)
             formdata.append('file', file);
             http.POST(API_QINIU_ROUTE, formdata, this, ACTION_FILE_DRAGGER, {'Content-Type': undefined})
         }
@@ -107,11 +107,11 @@ class FileDragger extends Component {
     onRealSuccess = (res, action) => {
         const {cdn = ''} = this.props
         if (!this.state.multiple) {
-            this.props.onChange(cdn + res.hash)
+            this.props.onChange(cdn + res.key)
             let {file} = this.state
             message.success(`${file.name} 文件上传成功.`)
-            file.status='done'
-            file.url = cdn + res.hash
+            file.status = 'done'
+            file.url = cdn + res.key
             this.setFile(file)
         }
         else {
@@ -146,17 +146,31 @@ class FileDragger extends Component {
         })
     }
 
-    handleCopyClick = (value) => {
-        let p = document.createElement('textarea')
-        p.value = value
-        p.select()
+    handleCopyClick = text => {
+        const textarea = document.createElement("textarea")
+        textarea.style = {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            border: 'none',
+            outline: 'none',
+            resize: 'none',
+            background: 'transparent',
+            color: 'transparent',
+            zIndex: -100
+        }
+        textarea.value = text
+        document.body.appendChild(textarea)
+        textarea.select()
+        let msg = '该浏览器不支持点击复制到剪贴板';
         try {
             const successful = document.execCommand('copy');
-            const msg = successful ? '成功复制到剪贴板' : '该浏览器不支持点击复制到剪贴板';
-            message.info(msg);
+            successful ? (msg = '成功复制到剪贴板') : null
+            document.removeChild(textarea)
         } catch (err) {
-            message.info('该浏览器不支持点击复制到剪贴板');
+
         }
+        message.info(msg);
     }
 
     render() {
