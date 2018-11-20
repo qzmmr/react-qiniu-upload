@@ -34,13 +34,12 @@ class PicturesWall extends Component {
 
     componentWillReceiveProps(nextProps) {
         const {
-            value,
             responsePrefix = default_responsePrefix,
             responseSuffix = default_responseSuffix
         } = this.props
         if (nextProps.value) {
             if (this.props.value === undefined) {
-                this.setSrc(responsePrefix + value + responseSuffix)
+                this.setSrc(responsePrefix + nextProps.value + responseSuffix)
             }
         }
     }
